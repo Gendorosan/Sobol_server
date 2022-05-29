@@ -5,6 +5,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from Content_recommendation import get_content_rec
+
 app = Flask(__name__)
 
 database = psycopg2.connect(database='Sobol', user='postgres', password=' ', host='127.0.0.1', port=5432)
@@ -133,13 +134,15 @@ def get_all_goods_from_subcategory():
                 [
                     {
                         'name': name,
-                        'id': id            
+                        'id': id,
+                        'price': price           
                     },
 
                     {
                         'name': name,
-                        'id': id            
-                    },
+                        'id': id
+                        'price': price            
+                    }
                 ]
         """
         data = request.get_json()
@@ -148,7 +151,51 @@ def get_all_goods_from_subcategory():
         for el in database_cursor:
             goods.append({"id": el[0], "name": el[1]})
 
+        for good in goods:
+            database_cursor.execute(f"select value from properties where name = 'Цена' and goods_id = {good['id']}")
+            price = database_cursor.fetchall()[0][0]
+            good.update({'price': price})
+
         return jsonify(goods)
+    except IndexError:
+        return jsonify({'answer': 'fail'})
+
+
+@app.route('/fill_cart', methods=['POST'])
+def get_all_goods_from_subcategory():
+    try:
+        """
+        {
+            'client': login
+            'goods': [1,2,3,4,...]
+        }
+        """
+        data = request.get_json()
+
+        database_cursor.execute(
+            f"insert into cart (client_login) values ('{data['client']}')")
+        database.commit()
+
+        database_cursor.execute(f"select id from cart where client_login = '{data['client']}' order by id desc LIMIT 1")
+        cart_id = database_cursor.fetchall()[0][0]
+
+        for good in data['goods']:
+            database_cursor.execute(
+                f"insert into goods_in_cart (goods_id, cart_id) values ({good}, {cart_id})")
+            database.commit()
+        return jsonify({'answer': 'success'})
+    except KeyError:
+        data = request.get_json()
+        database_cursor.execute(
+            "insert into cart (client_login) values (Null)")
+        database.commit()
+        database_cursor.execute("select max(id) from cart")
+        cart_id = database_cursor.fetchall()[0][0]
+        for good in data:
+            database_cursor.execute(
+                f"insert into goods_in_cart (goods_id, cart_id) values ({good}, {cart_id})")
+            database.commit()
+        return jsonify({'answer': 'success'})
     except IndexError:
         return jsonify({'answer': 'fail'})
 
