@@ -72,6 +72,41 @@ def get_content_recommendation():
         return jsonify(return_answer)
 
 
+@app.route('/get_collaborative_recommendation', methods=['POST'])
+def get_content_recommendation():
+    try:
+        """
+                [
+                    {
+                        'name': name,
+                        'id': id            
+                    },
+
+                    {
+                        'name': name,
+                        'id': id            
+                    }
+                ]
+
+         """
+        recomendation = [{'id': 99, 'name': 'Коврик самонадувающийся Helios с подушкой HS-005P'},
+                  {'id': 100, 'name': 'Коврик туристический Россия'},
+                  {'id': 98, 'name': 'Коврик самонадувающийся Trek Planet Camper 60 Double'},
+                  {'id': 180, 'name': 'Палатка Jungle Camp Dallas 4'},
+                  {'id': 179, 'name': 'Палатка Indiana Ventura 3'},
+                  {'id': 238, 'name': 'Репеллент Рефтамид Максимум 3 в 1'},
+                  {'id': 237, 'name': 'Репеллент Рефтамид Экстрим (усиленный)'},
+                  {'id': 2, 'name': 'Ремкомплект для лодок ПВХ'},
+                  {'id': 3, 'name': 'Якорь-кошка 2,5кг'},
+                  {'id': 1, 'name': 'Клей для лодок ПВХ'}]
+
+        return jsonify(recomendation)
+
+    except SyntaxError:
+        return_answer = {'answer': 'fail'}
+        return jsonify(return_answer)
+
+
 @app.route('/get_all_categories', methods=['GET'])
 def get_all_categories():
     try:
