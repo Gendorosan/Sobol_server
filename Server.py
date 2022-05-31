@@ -206,6 +206,7 @@ def get_goods_info():
         """
                        {
                             'name': name,
+                            'price': price,
                             'params': 
                                 [   
                                     {'name': name, 'value': value},
@@ -218,10 +219,12 @@ def get_goods_info():
         database_cursor.execute(f"select name from goods where id = {data['id']}")
 
         name = database_cursor.fetchall()[0][0]
+        database_cursor.execute(f"select value from properties where name = 'Цена' and goods_id = {data['id']}")
+        price = database_cursor.fetchall()[0][0]
 
-        database_cursor.execute(f"select name, value from properties where goods_id = {data['id']}")
+        goods_info = {'name': name, 'price': price, 'params': []}
+        database_cursor.execute(f"select name, value from properties where goods_id = {data['id']} and name != 'Цена'")
 
-        goods_info = {'name': name, 'params': []}
         for row in database_cursor:
             goods_info['params'].append({'name': row[0], 'value': row[1]})
 
