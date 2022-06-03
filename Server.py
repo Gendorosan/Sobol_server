@@ -73,7 +73,7 @@ def get_content_recommendation():
 
 
 @app.route('/get_collaborative_recommendation', methods=['POST'])
-def get_content_recommendation():
+def get_collaborative_recommendation():
     try:
         """
                 [
@@ -90,15 +90,15 @@ def get_content_recommendation():
 
          """
         recomendation = [{'id': 99, 'name': 'Коврик самонадувающийся Helios с подушкой HS-005P'},
-                  {'id': 100, 'name': 'Коврик туристический Россия'},
-                  {'id': 98, 'name': 'Коврик самонадувающийся Trek Planet Camper 60 Double'},
-                  {'id': 180, 'name': 'Палатка Jungle Camp Dallas 4'},
-                  {'id': 179, 'name': 'Палатка Indiana Ventura 3'},
-                  {'id': 238, 'name': 'Репеллент Рефтамид Максимум 3 в 1'},
-                  {'id': 237, 'name': 'Репеллент Рефтамид Экстрим (усиленный)'},
-                  {'id': 2, 'name': 'Ремкомплект для лодок ПВХ'},
-                  {'id': 3, 'name': 'Якорь-кошка 2,5кг'},
-                  {'id': 1, 'name': 'Клей для лодок ПВХ'}]
+                         {'id': 100, 'name': 'Коврик туристический Россия'},
+                         {'id': 98, 'name': 'Коврик самонадувающийся Trek Planet Camper 60 Double'},
+                         {'id': 180, 'name': 'Палатка Jungle Camp Dallas 4'},
+                         {'id': 179, 'name': 'Палатка Indiana Ventura 3'},
+                         {'id': 238, 'name': 'Репеллент Рефтамид Максимум 3 в 1'},
+                         {'id': 237, 'name': 'Репеллент Рефтамид Экстрим (усиленный)'},
+                         {'id': 2, 'name': 'Ремкомплект для лодок ПВХ'},
+                         {'id': 3, 'name': 'Якорь-кошка 2,5кг'},
+                         {'id': 1, 'name': 'Клей для лодок ПВХ'}]
 
         return jsonify(recomendation)
 
@@ -181,7 +181,7 @@ def get_all_goods_from_subcategory():
                 ]
         """
         data = request.get_json()
-        database_cursor.execute(f"select id, name from goods where sub_category = '{data['sub_category_id']}'")
+        database_cursor.execute(f"select id, name from goods where sub_category_id = '{data['sub_category_id']}'")
         goods = []
         for el in database_cursor:
             goods.append({"id": el[0], "name": el[1]})
@@ -197,7 +197,7 @@ def get_all_goods_from_subcategory():
 
 
 @app.route('/fill_cart', methods=['POST'])
-def get_all_goods_from_subcategory():
+def fill_cart():
     try:
         """
         {
@@ -205,6 +205,7 @@ def get_all_goods_from_subcategory():
             'goods': [1,2,3,4,...]
         }
         """
+
         data = request.get_json()
 
         database_cursor.execute(
@@ -221,12 +222,13 @@ def get_all_goods_from_subcategory():
         return jsonify({'answer': 'success'})
     except KeyError:
         data = request.get_json()
+
         database_cursor.execute(
             "insert into cart (client_login) values (Null)")
         database.commit()
         database_cursor.execute("select max(id) from cart")
         cart_id = database_cursor.fetchall()[0][0]
-        for good in data:
+        for good in data['goods']:
             database_cursor.execute(
                 f"insert into goods_in_cart (goods_id, cart_id) values ({good}, {cart_id})")
             database.commit()
