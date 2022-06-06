@@ -5,7 +5,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from Content_recommendation import get_content_rec
-
+from Сollaborative_recommendation import  get_collab_rec
 app = Flask(__name__)
 
 database = psycopg2.connect(database='Sobol', user='postgres', password=' ', host='127.0.0.1', port=5432)
@@ -18,8 +18,8 @@ def registration():
         data = request.get_json()
         database_cursor.execute(
             "INSERT INTO Client (login, password, name, surname)"
-            f"VALUES ('{data['login']}', {data['password']}', '{data['name']}',"
-            f" '{data['surname']}', '{data['lastname']}')")
+            f"VALUES ('{data['login']}', '{data['password']}', '{data['name']}',"
+            f" '{data['surname']}')")
         database.commit()
         return_answer = {'answer': 'success'}
         return jsonify(return_answer)
@@ -76,31 +76,30 @@ def get_content_recommendation():
 def get_collaborative_recommendation():
     try:
         """
-                [
-                    {
-                        'name': name,
-                        'id': id            
-                    },
-
-                    {
-                        'name': name,
-                        'id': id            
-                    }
-                ]
+        Приходит:
+        {
+            'login': login,
+            'basketArray': []
+        }
 
          """
-        recomendation = [{'id': 99, 'name': 'Коврик самонадувающийся Helios с подушкой HS-005P'},
-                         {'id': 100, 'name': 'Коврик туристический Россия'},
-                         {'id': 98, 'name': 'Коврик самонадувающийся Trek Planet Camper 60 Double'},
-                         {'id': 180, 'name': 'Палатка Jungle Camp Dallas 4'},
-                         {'id': 179, 'name': 'Палатка Indiana Ventura 3'},
-                         {'id': 238, 'name': 'Репеллент Рефтамид Максимум 3 в 1'},
-                         {'id': 237, 'name': 'Репеллент Рефтамид Экстрим (усиленный)'},
-                         {'id': 2, 'name': 'Ремкомплект для лодок ПВХ'},
-                         {'id': 3, 'name': 'Якорь-кошка 2,5кг'},
-                         {'id': 1, 'name': 'Клей для лодок ПВХ'}]
+        data = request.get_json()
 
-        return jsonify(recomendation)
+        recomendation = [{'id': 254, 'name': 'Спиннинг Aiko Pro Jigger PJ 792M', 'price': '10500'},
+                         {'id': 255, 'name': 'Спиннинг Aiko Espada Pro ESPP 240ML', 'price': '5760'},
+                         {'id': 253, 'name': 'Спиннинг MAJOR CRAFT Vierra 862H', 'price': '9770'},
+                         {'id': 86, 'name': 'Катушка Okuma Epixor XT Spinning Reel 30', 'price': '11600'},
+                         {'id': 85, 'name': 'Катушка Okuma ITX Carbon Spinning Reel 1000', 'price': '15200'},
+                         {'id': 34, 'name': 'Блесна вращающаяся с рыбкой BLUE FOX Vibrax CHASER 2 цвет',
+                          'price': '820'},
+                         {'id': 35, 'name': 'Блесна вращающаяся с рыбкой BLUE FOX Vibrax CHASER 2 цвет OCW',
+                          'price': '820'},
+                         {'id': 33, 'name': 'Блесна вращающаяся BLUE FOX Northern Lights Vibrax 2 цвет BL',
+                          'price': '510'},
+                         {'id': 2, 'name': 'Ремкомплект для лодок ПВХ', 'price': '400'},
+                         {'id': 1, 'name': 'Клей для лодок ПВХ', 'price': '150'}]
+
+        return jsonify(get_collab_rec(data['login'], data['basketArray']))
 
     except SyntaxError:
         return_answer = {'answer': 'fail'}

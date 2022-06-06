@@ -404,6 +404,8 @@ def get_content_rec(id):
         for good in recomedation:
             database_cursor.execute(f"select id from goods where name = '{good}'")
             for el in database_cursor:
-                goods.append({"id": el[0], "name": good})
+                database_cursor.execute(f"select value from properties where name = 'Цена' and goods_id = {el[0]}")
+                price = database_cursor.fetchall()[0][0]
+                goods.append({"id": el[0], "name": good, "price":price})
 
         return goods
